@@ -14,25 +14,16 @@ const userSchema = new mongoose.Schema({
     max: 100
   },
   email: {
-    type:String,
-    required:true,
-    unique:true
+    type: String,
+    required: true,
+    unique: true
   },
-  isAdmin: {
-    type: Boolean,
-    default: false
+  role: {
+    type: String,
+    required: true
   },
-  isApprover: {
-    type: Boolean,
-    default: false
-  },
-  isChecker: {
-    type: Boolean,
-    default: false
-  },
-  isMaker: {
-    type: Boolean,
-    default: false
+  editedBy:{
+    type:String
   }
 });
 userSchema.methods.generateAuthToken = function() {
@@ -40,12 +31,10 @@ userSchema.methods.generateAuthToken = function() {
     {
       _id: this._id,
       name: this.name,
-      isAdmin: this.Admin,
-      isApprover: this.isApprover,
-      isChecker: this.isChecker,
-      isMaker: this.isMaker
+      role: this.role,
+      email:this.email  
     },
-    "miracle"
+    process.env.SECRET_KEY
   );
   return token;
 };
@@ -62,7 +51,12 @@ function validateUser(user) {
       .min(8)
       .max(100)
       .required(),
-      name:joi.string().min(3).max(50).required()
+    name: joi
+      .string()
+      .min(3)
+      .max(50)
+      .required(),
+    role:joi.string().required()
   };
   return joi.validate(user, Schema);
 }
